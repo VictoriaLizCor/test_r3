@@ -35,6 +35,29 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
+void	check_after_string_data(char *str, int ret, int extra)
+{
+	int		i;
+	char	*buf;
+
+	if (str)
+	{
+		i = 0;
+		buf = str;
+		while (i < ret + extra)
+		{
+			if (!ft_strchr("\t\n\r\v\f", buf[i]))
+				printf("[ %c ]", *(buf + i));
+			else
+				printf("[ '\\%d' ]", *(buf + i));
+			i++;
+		}
+		printf("\n");
+	}
+	else
+		printf("%s \n", (void *)0);
+}
+
 void	print_list(t_list **list)
 {
 	t_list	*print;
@@ -118,7 +141,7 @@ void	add_node_to_list(t_list **list, char *read_buffer, int ret)
 		while (last->next != NULL)
 			last = last->next;
 	}
-	print_list(list);
+	// print_list(list);
 }
 
 void	free_node_list(void **list)
