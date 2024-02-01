@@ -49,7 +49,7 @@ void	check_after_string_data(char *str, int ret, int extra)
 			if (!ft_strchr("\t\n\r\v\f", buf[i]))
 				printf("[ %c ]", *(buf + i));
 			else
-				printf("[ '\\%d' ]", *(buf + i));
+				printf("[ '\\%d ]", *(buf + i));
 			i++;
 		}
 		printf("\n");

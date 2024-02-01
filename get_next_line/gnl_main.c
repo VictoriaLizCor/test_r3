@@ -6,7 +6,7 @@
 /*   By: lilizarr <lilizarr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 14:40:06 by lilizarr          #+#    #+#             */
-/*   Updated: 2024/02/01 16:31:50 by lilizarr         ###   ########.fr       */
+/*   Updated: 2024/02/01 16:42:27 by lilizarr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@ int	main(void)
 	int		i;
 
 	i = 1;
-	str = "ABCDEFGHIJ\nKLMN\nOPQRS\nTUVWXYZ\t\n1234567890\n_123*---&";
-	fd1 = open("file1", O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	write(fd1, str, ft_strlen(str));
-	close(fd1);
-	str = NULL;
-	sleep(1);
+	// str = "ABCDEFGHIJ\nKLMN\nOPQRS\nTUVWXYZ\t\n1234567890\n_123*---&";
+	// fd1 = open("file1", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	// write(fd1, str, ft_strlen(str));
+	// close(fd1);
+	// str = NULL;
+	// sleep(1);
 	fd1 = open("file1", O_RDONLY);
 	while (1)
 	{
@@ -48,9 +48,6 @@ int	main(void)
 		free(line);
 	}
 	if (close(fd1) == -1)
-	{
-		printf("| %s |", str);
 		return (1);
-	}
 	return (0);
 }
