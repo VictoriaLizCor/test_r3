@@ -6,7 +6,7 @@
 /*   By: lilizarr <lilizarr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 14:40:06 by lilizarr          #+#    #+#             */
-/*   Updated: 2024/02/01 16:29:26 by lilizarr         ###   ########.fr       */
+/*   Updated: 2024/02/01 16:31:50 by lilizarr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	main(void)
 	close(fd1);
 	str = NULL;
 	sleep(1);
-	fd1 = open("file1", O_RDONLY);;
+	fd1 = open("file1", O_RDONLY);
 	while (1)
 	{
 		line = get_next_line(fd1);
