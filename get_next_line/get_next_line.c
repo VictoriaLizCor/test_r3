@@ -1,6 +1,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 1
@@ -22,213 +25,131 @@ size_t	ft_strlen(const char *str)
 	return (cnt);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*ft_strchr(char *str, int c)
 {
-	while (*s)
+	while (*str)
 	{
-		if (*s == (char)c)
-			return ((char *)s);
-		s++;
+		if (*str == (char)c)
+			return (str);
+		str++;
 	}
-	if (!(*s) && !c)
-		return ((char *)s);
+	if (!c)
+		return (str);
 	return (NULL);
 }
 
-void	check_after_string_data(char *str, int ret, int extra)
-{
-	int		i;
-	char	*buf;
-
-	if (str)
-	{
-		i = 0;
-		buf = str;
-		while (i < ret + extra)
-		{
-			if (!ft_strchr("\t\n\r\v\f", buf[i]))
-				printf("[ %c ]", *(buf + i));
-			else
-				printf("[ '\\%d ]", *(buf + i));
-			i++;
-		}
-		printf("\n");
-	}
-	else
-		printf("%s \n", (void *)0);
-}
-
-void	print_list(t_list **list)
-{
-	t_list	*print;
-	int		i;
-
-	i = 0;
-	print = *list;
-	while (print)
-	{
-		print = print->next;
-		i++;
-	}
-	print = *list;
-	printf("\n------------- List HEAD Address : %p\t NODES: %d\n", *list, i);
-	while (print)
-	{
-		printf("%s", print->str);
-		print = print->next;
-		i++;
-	}
-}
-
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	*ft_memcpy(char *dst, char *src, size_t n)
 {
 	size_t	i;
 
 	i = n - 1;
-	while (n-- && (dest != NULL || src != NULL))
-		((char *)dest)[i - n] = (*(const char *)(src + (i - n)));
-	return (dest);
+	while (n-- && (dst || src))
+		dst[i - n] = src[i - n];
+	return (dst);
 }
 
-char	*ft_strdup_len(char *s1, size_t n)
+char	*ft_strdup(char *str, size_t n)
 {
-	char	*aux;
+	char	*new_str;
 
-	aux = (char *)malloc(n + 1);
-	if (aux == NULL)
-		return (NULL);
-	aux = ft_memcpy(aux, s1, n);
-	aux[n] = '\0';
-	return (aux);
+	new_str = (char *)malloc(sizeof(char) * (n + 1));
+	if (!new_str)
+		return ((void *)0);
+	new_str = ft_memcpy(new_str, str, n);
+	new_str[n] = '\0';
+	return (new_str);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*str_join(char *s1, char *s2)
 {
 	char	*str_join;
 
-	if (s1 && s2)
-	{
-		str_join = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-		if (!str_join)
-			return (NULL);
-		ft_memcpy(str_join, s1, ft_strlen(s1));
-		ft_memcpy(str_join + ft_strlen(s1), s2, ft_strlen(s2) + 1);
-		free((void *)s1);
-		return ((char *)str_join);
-	}
-	else
-		return (NULL);
+	if (!s1 || !s2)
+		return ((void *)0);
+	str_join = ft_strdup("", ft_strlen(s1) + ft_strlen(s2));
+	ft_memcpy(str_join, s1, ft_strlen(s1));
+	ft_memcpy(str_join + ft_strlen(s1), s2, ft_strlen(s2));
+	if (s1)
+		free(s1);
+	return (str_join);
 }
 
-void	add_node_to_list(t_list **list, char *read_buffer, int ret)
+void	search_line(char **ptr, char **line)
 {
-	t_list	*new_node;
-	t_list	*last;
-
-	new_node = (t_list *)malloc (sizeof(t_list));
-	if (!new_node)
-		*list = NULL;
-	new_node->str = ft_strdup_len(read_buffer, ret);
-	new_node->next = NULL;
-	if (!(*list))
-		*list = new_node;
-	else
-	{
-		last = *list;
-		while (last->next != NULL)
-			last = last->next;
-		last->next = new_node;
-		while (last->next != NULL)
-			last = last->next;
-	}
-	// print_list(list);
-}
-
-void	free_node_list(void **list)
-{
-	t_list	*tmp;
-	t_list	*to_erase;
-	int		i;
-
-	i = 0;
-	to_erase = *list;
-	tmp = to_erase->next;
-	free(to_erase->str);
-	free(to_erase);
-	*list = tmp;
-}
-
-void	search_line_ext(t_list **list, char **line, char *ptr)
-{
-	int		diff_nl;
-	char	*tmp;
-
-	diff_nl = ptr - ((*list)->str);
-	if (!(*line))
-		*line = ft_strdup_len((*list)->str, diff_nl + 1);
-	else
-	{
-		tmp = ft_strdup_len((*list)->str, diff_nl + 1);
-		*line = ft_strjoin(*line, tmp);
-		free(tmp);
-	}
-	if ((ft_strlen(ptr + 1)))
-	{
-		tmp = ft_strdup_len(ptr + 1, ft_strlen(ptr + 1));
-		free((*list)->str);
-		(*list)->str = tmp;
-	}
-	else
-		free_node_list((void *)(*&list));
-}
-
-void	search_line(t_list **list, char **line)
-{
-	char	*ptr;
-
-	while ((*list))
-	{
-		ptr = ft_strchr((*list)->str, '\n');
-		if (ptr)
-		{
-			search_line_ext((&*list), (&*line), ptr);
-			return ;
-		}
-		else
-		{
-			if (!(*line))
-				*line = ft_strdup_len((*list)->str, ft_strlen((*list)->str));
-			else
-				*line = ft_strjoin(*line, (*list)->str);
-			free_node_list((void *)(*&list));
-		}
-	}
+	if (!*line)
+		*line = ft_strdup("", 1);
+	// ptr = ft_strchr(buf, '\n');
+// 			if (ptr)
+// 			{
+// 				if (!line)
+// 					line = ft_strdup(buf, BUFFER_SIZE);
+// 				else
+// 					line = str_join(line, ft_strdup(buf, ptr - buf));
+// 				ft_memcpy(buf, ptr + 1, BUFFER_SIZE - (ptr - buf));
+// 				break ;
+// 			}
+// 			else
+// 				line = str_join(line, ft_strdup(buf, BUFFER_SIZE));
 }
 
 char	*get_next_line(int fd)
 {
-	static t_list		*list;
-	int					ret;
-	char				*line;
-	char				*read_buffer;
+	char		*buf;
+	char		*line;
+	static char	*ptr;
+	int			ret;
 
 	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
-		return (NULL);
-	line = NULL;
-	read_buffer = (char *)malloc(BUFFER_SIZE);
-	if (!read_buffer)
-		return (NULL);
-	read_buffer[BUFFER_SIZE] = 0;
+		return ((void *)0);
+	line = (void *)0;
+	buf = ft_strdup("", BUFFER_SIZE - 1);
 	while (1)
 	{
-		ret = read(fd, read_buffer, BUFFER_SIZE);
-		if (!ret || ret < 0)
+		ret = read(fd, buf, BUFFER_SIZE);
+		if (ret)
+			printf("%d --------- %s\n", ret, buf);
+		if (ret <= 0)
 			break ;
+		if (!ptr)
+			ptr = ft_strdup(buf, BUFFER_SIZE);
 		else
-			add_node_to_list(&list, read_buffer, ret);
+			ptr = str_join(ptr, buf);
+		printf("%s\n", ptr);
 	}
-	free(read_buffer);
-	print_list(&list);
-	search_line(&list, &line);
-	return (&*line);
+	free(buf);
+	// search_line(&ptr, &line);
+	return (ptr );
+}
+
+// ptr = ft_strchr(buf, '\n');
+// 			if (ptr)
+// 			{
+// 				if (!line)
+// 					line = ft_strdup(buf, BUFFER_SIZE);
+// 				else
+// 					line = str_join(line, ft_strdup(buf, ptr - buf));
+// 				ft_memcpy(buf, ptr + 1, BUFFER_SIZE - (ptr - buf));
+// 				break ;
+// 			}
+// 			else
+// 				line = str_join(line, ft_strdup(buf, BUFFER_SIZE));
+
+int	main(void)
+{
+	char	*str2;
+	int		fd;
+
+	fd = open("file1", O_RDONLY, 0644);
+	get_next_line(fd);
+	while (1)
+	{
+		str2 = get_next_line(fd);
+		printf("%s\n", str2);
+		if (str2)
+			free(str2);
+		else
+			break ;
+	}
+	close(fd);
+	return (0);
 }
