@@ -1,15 +1,15 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h>
-// #include <stdio.h>
-// #include <fcntl.h>
-// #include <string.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 1
 #endif
 
-int	ft_strlen(const char *str)
+int	ft_strlen(char *str)
 {
 	int	cnt;
 
@@ -27,7 +27,7 @@ char	*ft_strchr(char *str, int c)
 			return (str);
 		str++;
 	}
-	if (!c)
+	if (!c && !*str)
 		return (str);
 	return (NULL);
 }
@@ -68,44 +68,61 @@ char	*str_join(char *s1, char *s2)
 	return (str_join);
 }
 
+void	check_after_string_data(char *str, int extra)
+{
+	int		i;
+	char	*buf;
+
+	if (str)
+	{
+		i = 0;
+		buf = str;
+		while (i <= ft_strlen(str) + extra)
+		{
+			if (!ft_strchr("\t\n\r\v\f", buf[i]))
+				printf("[ %c ]", *(buf + i));
+			else
+				printf("[ '\\%d' ]", *(buf + i));
+			i++;
+		}
+		printf("\n---------\n");
+	}
+	else
+		printf("%s", (void *)0);
+}
+
 void	search_line(char **ptr, char **line)
 {
 	char	*tmp;
 	int		dif;
 
 	dif = 0;
-	// printf("\n-----PTR-------\n");
-	// printf("%s", *ptr);
-	// printf("\n---------\n");
-	if (!*ptr)
-		return ;
+	check_after_string_data(*ptr, 2);
 	tmp = ft_strchr(*ptr, '\n');
+	// if (tmp)
+	// 	printf("%s| %d\n\n", tmp, ft_strlen(tmp));
 	if (tmp)
 	{
-		dif = tmp - (*ptr) + 1;
+		dif = tmp - (*ptr);
 		*line = ft_strdup(*ptr, dif);
-		if (tmp + 1)
-			tmp = ft_strdup(tmp + 1, ft_strlen(tmp));
+		if (ft_strlen(tmp + 1) > 1)
+			tmp = ft_strdup(tmp + 1, ft_strlen(tmp) + 1);
 		else
-			tmp = ft_strdup(tmp, ft_strlen(tmp));
+			tmp = ft_strdup(tmp, 1);
 		if (*ptr)
 			free(*ptr);
 		*ptr = tmp;
 	}
 	else
 	{
-		*line = ft_strdup(*ptr, ft_strlen(*ptr));
+		if (ft_strlen(*ptr) > 0)
+			*line = ft_strdup(*ptr, ft_strlen(*ptr));
 		if (*ptr)
 			free(*ptr);
-		*ptr = NULL;
+		*ptr = (void *)0;
 	}
-	// printf("diff [%d] \n", dif);
-	// if (*line)
-	// {
-	// 	printf("[%d]", ft_strlen(*line));
-	// 	printf("| %d : ", (*line)[ft_strlen(*line) - 1]);
-	// }
-	// printf("LINE-> %s", *line);
+	// check_after_string_data(*line, 2);
+	// check_after_string_data(*ptr, 2);
 }
 
 char	*get_next_line(int fd)
@@ -118,12 +135,10 @@ char	*get_next_line(int fd)
 	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
 		return ((void *)0);
 	line = (void *)0;
-	buf = ft_strdup("", BUFFER_SIZE - 1);
+	buf = ft_strdup("", BUFFER_SIZE);
 	while (1)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
-		// if (ret)
-		// 	printf("%d --------- %s\n", ret, buf);
 		if (ret <= 0)
 			break ;
 		if (!ptr)
@@ -133,34 +148,49 @@ char	*get_next_line(int fd)
 	}
 	if (buf)
 		free(buf);
-	search_line(&ptr, &line);
+	if (ptr)
+		search_line(&ptr, &line);
 	return (line);
 }
 
-// int	main(void)
-// {
-// 	char	*str2;
-// 	int		fd;
-// 	int		i;
+int	main(void)
+{
+	char	*str2;
+	int		fd;
+	int		i;
 
-// 	i = 1;
-// 	fd = open("../../success/Rank03/get_next_line/file1", O_RDONLY, 0644);
-// 	while (1)
-// 	{
-// 		str2 = get_next_line(fd);
-// 		// printf("[%d]RETURN->", i++);
-// 		// if (str2)
-// 		// {
-// 		// 	printf("[%d] ", ft_strlen(str2));
-// 		// 	printf("| %d : ", str2[ft_strlen(str2) - 1]);
-// 		// }
-// 		printf("%s", str2);
-// 		if (str2)
-// 			free(str2);
-// 		else
-// 			break ;
-// 	}
-// 	printf("\n");
-// 	close(fd);
-// 	return (0);
-// }
+	i = 1;
+	fd = open("../../success/Rank03/get_next_line/files/nl", O_RDONLY, 0644);
+	// fd = open("../../success/Rank03/get_next_line/files/file1", O_RDONLY, 0644);
+	while (1)
+	{
+		str2 = get_next_line(fd);
+		// printf("[%d]RETURN->", i++);
+		// if (str2)
+		// {
+		// 	printf("[%d] ", ft_strlen(str2));
+		// 	printf("| %d : ", str2[ft_strlen(str2) - 1]);
+		// }
+		// printf("%s", str2);
+		if (str2)
+			free(str2);
+		else
+			break ;
+	}
+	printf("\n----\n");
+	close(fd);
+	// fd = open("../../success/Rank03/get_next_line/files/nl", O_RDONLY, 0644);
+	// while (1)
+	// {
+	// 	str2 = get_next_line(fd);
+	// 	printf("[%d]RETURN->", i++);
+	// 	check_after_string_data(str2, 2);
+	// 	if (str2)
+	// 		free(str2);
+	// 	else
+	// 		break ;
+	// }
+	// close(fd);
+	// printf("\n----\n");
+	return (0);
+}
