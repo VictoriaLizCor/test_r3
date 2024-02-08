@@ -1,9 +1,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
+// #include <stdio.h>
+// #include <fcntl.h>
+// #include <string.h>
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 1
@@ -70,22 +70,22 @@ char	*str_join(char *s1, char *s2)
 
 void	search_line(char **ptr, char **line)
 {
-	char *tmp;
-	int dif;
+	char	*tmp;
+	int		dif;
 
 	dif = 0;
-	printf("\n-----PTR-------\n");
-	printf("%s", *ptr);
-	printf("\n---------\n");
+	// printf("\n-----PTR-------\n");
+	// printf("%s", *ptr);
+	// printf("\n---------\n");
 	if (!*ptr)
 		return ;
 	tmp = ft_strchr(*ptr, '\n');
 	if (tmp)
 	{
-		dif = tmp - (*ptr);
+		dif = tmp - (*ptr) + 1;
 		*line = ft_strdup(*ptr, dif);
 		if (tmp + 1)
-			tmp = ft_strdup(tmp + 1, ft_strlen(tmp + 1));
+			tmp = ft_strdup(tmp + 1, ft_strlen(tmp));
 		else
 			tmp = ft_strdup(tmp, ft_strlen(tmp));
 		if (*ptr)
@@ -99,10 +99,13 @@ void	search_line(char **ptr, char **line)
 			free(*ptr);
 		*ptr = NULL;
 	}
-	printf("diff [%d] \n", dif);
-	if (*line)
-		printf("[%d]", ft_strlen(*line));
-	printf("LINE-> %s", *line);
+	// printf("diff [%d] \n", dif);
+	// if (*line)
+	// {
+	// 	printf("[%d]", ft_strlen(*line));
+	// 	printf("| %d : ", (*line)[ft_strlen(*line) - 1]);
+	// }
+	// printf("LINE-> %s", *line);
 }
 
 char	*get_next_line(int fd)
@@ -112,15 +115,15 @@ char	*get_next_line(int fd)
 	static char	*ptr;
 	int			ret;
 
-	if (fd < 0 || fd >= FOPEN_MAX || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
 		return ((void *)0);
 	line = (void *)0;
 	buf = ft_strdup("", BUFFER_SIZE - 1);
 	while (1)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
-		if (ret)
-			printf("%d --------- %s\n", ret, buf);
+		// if (ret)
+		// 	printf("%d --------- %s\n", ret, buf);
 		if (ret <= 0)
 			break ;
 		if (!ptr)
@@ -134,31 +137,30 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-int	main(void)
-{
-	char	*str2;
-	int		fd;
-	int 	i;
+// int	main(void)
+// {
+// 	char	*str2;
+// 	int		fd;
+// 	int		i;
 
-	i = 1;
-	fd = open("file1", O_RDONLY, 0644);
-	while (1 && i < 10)
-	{
-		str2 = get_next_line(fd);
-		printf("\n[%d]RETURN->", i++);
-		if(str2)
-		{
-			printf("[%d] ", ft_strlen(str2));
-			printf("| %d : ", str2[ft_strlen(str2) - 1]);
-		}
-		printf("%s", str2);
-		if (str2)
-			free(str2);
-		else
-			break ;
-	}
-	printf("\n[%d]ft_len-> %s", ft_strlen("abcdf\n"), "abcdf\n");
-	printf("\\n = [%d]\n", '\n');
-	close(fd);
-	return (0);
-}
+// 	i = 1;
+// 	fd = open("../../success/Rank03/get_next_line/file1", O_RDONLY, 0644);
+// 	while (1)
+// 	{
+// 		str2 = get_next_line(fd);
+// 		// printf("[%d]RETURN->", i++);
+// 		// if (str2)
+// 		// {
+// 		// 	printf("[%d] ", ft_strlen(str2));
+// 		// 	printf("| %d : ", str2[ft_strlen(str2) - 1]);
+// 		// }
+// 		printf("%s", str2);
+// 		if (str2)
+// 			free(str2);
+// 		else
+// 			break ;
+// 	}
+// 	printf("\n");
+// 	close(fd);
+// 	return (0);
+// }
