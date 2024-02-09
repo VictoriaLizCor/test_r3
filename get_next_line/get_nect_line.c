@@ -6,7 +6,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 1
+# define BUFFER_SIZE 42
 #endif
 
 int	ft_strlen(char *str)
@@ -68,7 +68,7 @@ char	*str_join(char *s1, char *s2)
 	return (str_join);
 }
 
-void	check_after_string_data(char *str, int extra)
+void	check_after_string_data(char *str, int extra, char *id)
 {
 	int		i;
 	char	*buf;
@@ -77,6 +77,7 @@ void	check_after_string_data(char *str, int extra)
 	{
 		i = 0;
 		buf = str;
+		printf("\n%s->", id);
 		while (i <= ft_strlen(str) + extra)
 		{
 			if (!ft_strchr("\t\n\r\v\f", buf[i]))
@@ -88,7 +89,7 @@ void	check_after_string_data(char *str, int extra)
 		printf("\n---------\n");
 	}
 	else
-		printf("%s", (void *)0);
+		printf("\n%s->%s", id, (void *)0);
 }
 
 void	search_line(char **ptr, char **line)
@@ -97,32 +98,22 @@ void	search_line(char **ptr, char **line)
 	int		dif;
 
 	dif = 0;
-	check_after_string_data(*ptr, 2);
+	printf("ptr->%s| %d\n", *ptr, ft_strlen(*ptr));
 	tmp = ft_strchr(*ptr, '\n');
-	// if (tmp)
-	// 	printf("%s| %d\n\n", tmp, ft_strlen(tmp));
 	if (tmp)
 	{
 		dif = tmp - (*ptr);
-		*line = ft_strdup(*ptr, dif);
-		if (ft_strlen(tmp + 1) > 1)
-			tmp = ft_strdup(tmp + 1, ft_strlen(tmp) + 1);
+		*line = ft_strdup(*ptr, dif + 1);
+		if (tmp + 1)
+			tmp = ft_strdup(tmp + 1, ft_strlen(tmp + 1));
 		else
-			tmp = ft_strdup(tmp, 1);
-		if (*ptr)
-			free(*ptr);
-		*ptr = tmp;
+			tmp = ft_strdup(tmp, ft_strlen(tmp));
 	}
-	else
-	{
-		if (ft_strlen(*ptr) > 0)
-			*line = ft_strdup(*ptr, ft_strlen(*ptr));
-		if (*ptr)
-			free(*ptr);
-		*ptr = (void *)0;
-	}
-	// check_after_string_data(*line, 2);
-	// check_after_string_data(*ptr, 2);
+	else if (**ptr)
+		*line = ft_strdup(*ptr, ft_strlen(*ptr));
+	if (*ptr)
+		free(*ptr);
+	*ptr = tmp;
 }
 
 char	*get_next_line(int fd)
@@ -139,17 +130,25 @@ char	*get_next_line(int fd)
 	while (1)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
+		buf[ret] = '\0';
+		printf(" ------------- RET = %d -------------\n", ret);
 		if (ret <= 0)
 			break ;
 		if (!ptr)
-			ptr = ft_strdup(buf, BUFFER_SIZE);
+			ptr = ft_strdup(buf, ret);
 		else
 			ptr = str_join(ptr, buf);
 	}
 	if (buf)
 		free(buf);
+	check_after_string_data(ptr, 2, "ptr");
 	if (ptr)
 		search_line(&ptr, &line);
+	check_after_string_data(line, 2, "line");
+	if (line)
+		printf("line->%s| %d\n", line, ft_strlen(line));
+	else
+		printf("\n%s", line);
 	return (line);
 }
 
@@ -160,9 +159,10 @@ int	main(void)
 	int		i;
 
 	i = 1;
-	fd = open("../../success/Rank03/get_next_line/files/nl", O_RDONLY, 0644);
+	fd = open("./files/file1", O_RDONLY, 0644);
+	// fd = open("../../success/Rank03/get_next_line/files/41_with_nl", O_RDONLY, 0644);
 	// fd = open("../../success/Rank03/get_next_line/files/file1", O_RDONLY, 0644);
-	while (1)
+	while (1 && i++ < 10)
 	{
 		str2 = get_next_line(fd);
 		// printf("[%d]RETURN->", i++);
