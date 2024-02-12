@@ -88,14 +88,12 @@ void	search_line(char **ptr, char **line)
 	*ptr = tmp;
 }
 
-char	*get_next_line(int fd)
-{
 	char		*buf;
 	char		*line;
-	static char	*ptr;
+	static char	*ptr[OPEN_MAX];
 	int			ret;
 
-	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > OPEN_MAX || BUFFER_SIZE <= 0)
 		return (NULL);
 	line = NULL;
 	buf = ft_strdup("", BUFFER_SIZE - 1);
@@ -105,15 +103,14 @@ char	*get_next_line(int fd)
 		buf[ret] = '\0';
 		if (ret <= 0)
 			break ;
-		if (!ptr)
-			ptr = ft_strdup(buf, ret);
+		if (!ptr[fd])
+			ptr[fd] = ft_strdup(buf, ret);
 		else
-			ptr = str_join(ptr, buf);
+			ptr[fd] = str_join(ptr[fd], buf);
 	}
 	if (buf)
 		free(buf);
-	if (ptr)
-		search_line(&ptr, &line);
+	if (ptr[fd])
+		search_line(&ptr[fd], &line);
 	return (line);
-}
 
