@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 void	put_string(char *string, int *length)
 {
@@ -9,38 +10,39 @@ void	put_string(char *string, int *length)
 		*length += write(1, string++, 1);
 }
 
-void	put_digit(long long int number, int base, int *length)
+void	put_digit(long int number, int base, int *length)
 {
-	char	*hexadecimal = "0123456789abcdef";
+	char	*hexadecimal;
 
+	hexadecimal = "0123456789abcdef";
 	if (number < 0)
 	{
 		number *= -1;
 		*length += write(1, "-", 1);
 	}
-	if (number >= base)
+	if (number / base)
 		put_digit((number / base), base, length);
 	*length += write(1, &hexadecimal[number % base], 1);
 }
 
 int	ft_printf(const char *format, ...)
 {
-	int length = 0;
-
+	int		length;
 	va_list	pointer;
-	va_start(pointer, format);
 
+	length = 0;
+	va_start(pointer, format);
 	while (*format)
 	{
-		if ((*format == '%') && ((*(format + 1) == 's') || (*(format + 1) == 'd') || (*(format + 1) == 'x')))
+		if ((*format == '%'))
 		{
-			format++;
-			if (*format == 's')
+			if (*(format + 1) == 's')
 				put_string(va_arg(pointer, char *), &length);
-			else if (*format == 'd')
-				put_digit((long long int)va_arg(pointer, int), 10, &length);
-			else if (*format == 'x')
-				put_digit((long long int)va_arg(pointer, unsigned int), 16, &length);
+			else if (*(format + 1) == 'd')
+				put_digit((long int)va_arg(pointer, int), 10, &length);
+			else if (*(format + 1) == 'x')
+				put_digit((unsigned int)va_arg(pointer, void *), 16, &length);
+			format++;
 		}
 		else
 			length += write(1, format, 1);
