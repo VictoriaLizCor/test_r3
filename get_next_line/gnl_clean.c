@@ -79,19 +79,13 @@ void	search_line(char **ptr, char **line)
 		if (tmp + 1)
 			tmp = ft_strdup(tmp + 1, ft_strlen(tmp + 1));
 		else
-			tmp = ft_strdup(tmp, 1);
-		if (*ptr)
-			free(*ptr);
-		*ptr = tmp;
+			tmp = ft_strdup(tmp, ft_strlen(tmp));
 	}
-	else
-	{
-		if (**ptr)
-			*line = ft_strdup(*ptr, ft_strlen(*ptr));
-		if (*ptr)
-			free(*ptr);
-		*ptr = (void *)0;
-	}
+	else if (**ptr)
+		*line = ft_strdup(*ptr, ft_strlen(*ptr));
+	if (*ptr)
+		free(*ptr);
+	*ptr = tmp;
 }
 
 char	*get_next_line(int fd)
@@ -102,15 +96,15 @@ char	*get_next_line(int fd)
 	int			ret;
 
 	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
-		return ((void *)0);
-	line = (void *)0;
-	buf = ft_strdup("", BUFFER_SIZE);
+		return (NULL);
+	line = NULL;
+	buf = ft_strdup("", BUFFER_SIZE - 1);
 	while (1)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
+		buf[ret] = '\0';
 		if (ret <= 0)
 			break ;
-		buf[ret] = '\0';
 		if (!ptr)
 			ptr = ft_strdup(buf, ret);
 		else
